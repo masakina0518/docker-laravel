@@ -1,0 +1,77 @@
+version: '3'
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+  web:
+    build: ./docker/web
+    ports:
+        - 8080:80
+    environment:
+      VIRTUAL_HOST: app.laravel.local
+    volumes:
+        - ./app:/var/www/html
+        - ./logs/nginx:/var/log/nginx/
+    depends_on:
+        - app
+  app:
+    build: ./docker/app
+    environment:
+      PHP_INI_DIR: /etc/php7
+    volumes:
+      - ./app:/var/www/html
+    depends_on:
+        - db
+        - mail
+        - redis
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+    ports:
+      - 3306:3306
+  mail:
+    build: ./docker/mail
+    environment:
+      VIRTUAL_HOST: mail.laravel.local
+    # ports:
+    #   - "1080:80"
+  dbclient:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      VIRTUAL_HOST: phpmyadmin.laravel.local
+      MYSQL_DATABASE: wordpress
+      PMA_ARBITRARY: 1
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: password
+    depends_on:
+        - db
+    ports:
+      - 8082:80
+  redis:
+    image: "redis:5.0.12-alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+  awslocal:
+    image: localstack/localstack:0.12.8
+    environment:
+      DATA_DIR: /tmp/localstack/data
+      SERVICES: apigateway,kinesis,dynamodb,dynamodbstreams,elasticsearch,s3,lambda,sns,sqs,redshift,es,ses,route53,cloudformation,cloudwatch,ssm,secretsmanager,stepfunctions,logs,sts,iam,ec2
+      DEFAULT_REGION: ap-northeast-1
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - ./data/localstack:/tmp/localstack   
+    ports:
+      - 4566:4566
+      - 4571:4571
