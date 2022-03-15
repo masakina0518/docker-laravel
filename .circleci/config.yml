@@ -17,8 +17,7 @@ jobs:
 
     steps:
       - checkout
-      - run: cd app
-      - run: ls
+      - run: php app/composer.phar install
       - run: echo "this is the test job"
 
 # ジョブの実行順の指定
