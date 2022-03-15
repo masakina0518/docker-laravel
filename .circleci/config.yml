@@ -24,7 +24,7 @@ jobs:
           working_directory: app
           command: npm run production
       - persist_to_workspace:
-         root: /tmp/repo
+         root: /tmp/workspace
          paths:
            - app/*
 
@@ -33,7 +33,7 @@ jobs:
       name: default
     steps:
       - attach_workspace: 
-          at: /tmp/repo
+          at: /tmp/workspace
       - run: ls
       - run:
           working_directory: app
@@ -44,7 +44,7 @@ jobs:
       name: default
     steps:
       - attach_workspace: 
-          at: /tmp/repo
+          at: /tmp/workspace
       - run: 
           working_directory: app
           command: ls
