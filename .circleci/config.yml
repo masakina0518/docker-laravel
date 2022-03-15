@@ -16,7 +16,7 @@ jobs:
       - run: npm -v
       - run:
           working_directory: app
-          command: composer install -n --prefer-dist --working-dir=./app
+          command: composer install -n --prefer-dist
       - run:
           working_directory: app
           command: npm install
@@ -45,7 +45,9 @@ jobs:
     steps:
       - attach_workspace: 
           at: /tmp/repo
-      - run: ls
+      - run: 
+          working_directory: app
+          command: ls
       - run: echo "deploy job!"
 
 # ジョブの実行順の指定
