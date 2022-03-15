@@ -7,8 +7,7 @@ jobs:
       - image: circleci/php:7.1-node-browsers
     steps:
       - checkout
-      - run: cd app
-      - run: ls
+      - run: composer install -n --prefer-dist --working-dir=./app
       - run: echo "this is the build job"
 
   test:
@@ -17,7 +16,6 @@ jobs:
 
     steps:
       - checkout
-      - run: php app/composer.phar install
       - run: echo "this is the test job"
 
 # ジョブの実行順の指定
