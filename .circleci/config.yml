@@ -8,6 +8,9 @@ jobs:
     steps:
       - checkout
       - run: composer install -n --prefer-dist --working-dir=./app
+      - run: npm -v
+      - run: npm install --prefix ./app
+      - run: npm run production --prefix ./app
       - run: echo "this is the build job"
 
   test:
