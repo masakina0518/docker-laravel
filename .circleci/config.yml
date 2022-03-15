@@ -12,13 +12,17 @@ jobs:
       - run: npm install --prefix ./app
       - run: npm run production --prefix ./app
       - run: echo "this is the build job"
-
+      - persist_to_workspace:
+         root: .
+         paths:
+           - .
   test:
     docker:
       - image: circleci/php:7.3-apache-node-browsers-legacy
 
     steps:
-      - checkout
+      - attach_workspace: 
+          at: .
       - run: ls
       - run:
           name: Test run
