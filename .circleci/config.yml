@@ -3,7 +3,7 @@ executors:
   default:
     docker:
       - image: circleci/php:7.3-apache-node-browsers-legacy
-    working_directory: /tmp/repo
+    working_directory: /tmp/workspace
 
 # このプロジェクトで実行するジョブの定義
 jobs:
@@ -13,15 +13,21 @@ jobs:
       name: default
     steps:
       - checkout
-      - run: composer install -n --prefer-dist --working-dir=./app
       - run: npm -v
-      - run: npm install --prefix ./app
-      - run: npm run production --prefix ./app
-      - run: echo "this is the build job"
+      - run:
+          working_directory: app
+          command: composer install -n --prefer-dist --working-dir=./app
+      - run:
+          working_directory: app
+          command: npm install
+      - run: 
+          working_directory: app
+          command: npm run production
       - persist_to_workspace:
          root: /tmp/repo
          paths:
            - app/*
+
   test:
     executor:
       name: default
@@ -30,10 +36,9 @@ jobs:
           at: /tmp/repo
       - run: ls
       - run:
-          name: Test run
-          command: |
-            cd ./app
-            php artisan test
+          working_directory: app
+          command: php artisan test
+
   deploy:
     executor:
       name: default
