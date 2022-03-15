@@ -19,10 +19,10 @@ jobs:
 
     steps:
       - checkout
+      - run: ls
       - run:
           name: Test run
           command: |
-            cd ./app
             php artisan test
       - run: echo "this is the test job"
 
