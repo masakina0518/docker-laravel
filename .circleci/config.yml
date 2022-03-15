@@ -34,7 +34,14 @@ jobs:
           command: |
             cd ./app
             php artisan test
-      - run: echo "this is the test job"
+  deploy:
+    executor:
+      name: default
+    steps:
+      - attach_workspace: 
+          at: /tmp/repo
+      - run: ls
+      - run: echo "deploy job!"
 
 # ジョブの実行順の指定
 workflows:
@@ -44,3 +51,11 @@ workflows:
       - test:
           requires:
             - build
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - develop
+    
