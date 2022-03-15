@@ -1,29 +1,68 @@
 version: 2.1
+executors:
+  default:
+    docker:
+      - image: circleci/php:7.3-apache-node-browsers-legacy
+    working_directory: /tmp/workspace
 
 # このプロジェクトで実行するジョブの定義
 jobs:
+
   build:
-    docker:
-      - image: circleci/php:7.1-node-browsers
+    executor:
+      name: default
     steps:
       - checkout
-      - run: cd app
-      - run: ls
-      - run: echo "this is the build job"
+      - run: npm -v
+      - run:
+          working_directory: app
+          command: composer install -n --prefer-dist
+      - run:
+          working_directory: app
+          command: npm install
+      - run: 
+          working_directory: app
+          command: npm run production
+      - persist_to_workspace:
+         root: /tmp/workspace
+         paths:
+           - app/*
 
   test:
-    docker:
-      - image: circleci/php:7.1-node-browsers
-
+    executor:
+      name: default
     steps:
-      - checkout
-      - run: cd app
+      - attach_workspace: 
+          at: /tmp/workspace
       - run: ls
-      - run: echo "this is the test job"
+      - run:
+          working_directory: app
+          command: php artisan test
+
+  deploy:
+    executor:
+      name: default
+    steps:
+      - attach_workspace: 
+          at: /tmp/workspace
+      - run: 
+          working_directory: app
+          command: ls
+      - run: echo "deploy job!"
 
 # ジョブの実行順の指定
 workflows:
   build_and_test:
     jobs:
       - build
-      - test
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - develop
+    
