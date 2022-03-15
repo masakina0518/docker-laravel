@@ -5,7 +5,7 @@ jobs:
   build:
     docker:
       - image: circleci/php:7.3-apache-node-browsers-legacy
-    working_directory: ~/repo
+    working_directory: /tmp/repo
     steps:
       - checkout
       - run: composer install -n --prefer-dist --working-dir=./app
@@ -14,7 +14,7 @@ jobs:
       - run: npm run production --prefix ./app
       - run: echo "this is the build job"
       - persist_to_workspace:
-         root: ~/repo
+         root: /tmp/repo
          paths:
            - app/*
   test:
@@ -23,7 +23,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - attach_workspace: 
-          at: ~/repo
+          at: /tmp/repo
       - run: ls
       - run:
           name: Test run
