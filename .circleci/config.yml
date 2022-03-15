@@ -23,7 +23,8 @@ jobs:
       - run:
           name: Test run
           command: |
-            php artisan test
+            cd ./app
+            ls
       - run: echo "this is the test job"
 
 # ジョブの実行順の指定
